@@ -1,0 +1,1 @@
+export const endpoint = "http://jojjoeeeeeee.trueddns.com:53386";
