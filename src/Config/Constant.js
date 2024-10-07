@@ -1,1 +1,1 @@
-export const endpoint = "http://jojjoeeeeeee.trueddns.com:53386";
+export const endpoint = "https://goofysongtriviabackend.onrender.com";

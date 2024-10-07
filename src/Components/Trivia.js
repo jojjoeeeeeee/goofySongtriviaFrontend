@@ -91,7 +91,6 @@ const Trivia = ({
   useEffect(() => {
     const handleGetQuestion = (data) => {
       setSelectedAnswer("");
-      console.log("Received question data:", data.trivia);
       cbOnLoadAudio(data.trivia.audioUrl);
       setQuestionName(data.trivia.question);
       setAnswerOpions(data.trivia.choices);
