@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { sessionSocket } from "../sessionSocket";
 import {
   Grid,
@@ -16,14 +16,20 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { createAvatar } from "@dicebear/core";
 import { adventurer } from "@dicebear/collection";
 import PlayerListThree from "./PlayerListTree";
+import ShareButton from "./ShareButton";
 
-const GameJoin = ({ playersList, cbHandleJoined }) => {
-  const [searchUserId, setSearchUserId] = useState("");
+const GameJoin = ({ playersList, cbHandleOnStart, roomCode }) => {
   const [username, setUsername] = useState("");
   const [yourUsername, setYourUsername] = useState("");
   const [isHost, setIsHost] = useState(false);
   const [avatarDataUri, setAvatarDataUri] = useState("");
+  const hasJoinedRef = useRef(false);
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up("md"));
+
+  const getGameUrl = () => {
+    const { protocol, host } = window.location;
+    return `${protocol}//${host}/?r=${roomCode}`;
+  };
 
   useEffect(() => {
     sessionSocket.on("getPlayer", (userList) => {
@@ -34,7 +40,7 @@ const GameJoin = ({ playersList, cbHandleJoined }) => {
         (player) => player.id === sessionSocket.id
       );
       if (matchingPlayers.length === 0) return;
-      cbHandleJoined();
+      hasJoinedRef.current = true;
       setYourUsername(matchingPlayers[0].username);
       setAvatarDataUri(matchingPlayers[0].avatarDataUri);
       setIsHost(matchingPlayers[0].host);
@@ -45,9 +51,25 @@ const GameJoin = ({ playersList, cbHandleJoined }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleOnStartGameCountDown = () => {
+      if (hasJoinedRef.current) {
+        cbHandleOnStart();
+      } else if (!hasJoinedRef.current) {
+        window.history.replaceState({}, document.title, `/?r=${roomCode}`);
+        window.location.reload();
+      }
+    }
+    sessionSocket.on("onStartGameCountDown", handleOnStartGameCountDown);
+
+    return () => {
+      sessionSocket.off("onStartGameCountdown", handleOnStartGameCountDown);
+    };
+  }, []);
+
   const joinGame = () => {
     if (username !== "") {
-      sessionSocket.emit("joinGame", { username, avatarDataUri });
+      sessionSocket.emit("joinGame", { roomCode, username, avatarDataUri });
     }
   };
 
@@ -87,7 +109,7 @@ const GameJoin = ({ playersList, cbHandleJoined }) => {
   };
 
   const handleOnStart = () => {
-    sessionSocket.emit("startGame");
+    sessionSocket.emit("startGame", { roomCode });
   };
 
   return (
@@ -101,7 +123,7 @@ const GameJoin = ({ playersList, cbHandleJoined }) => {
           mb={3}
         >
           Goofy Song Trivia !<br />
-          Game Room
+          Game Room : {roomCode}
         </Typography>
       </Grid>
       {avatarDataUri !== "" && (
@@ -256,6 +278,11 @@ const GameJoin = ({ playersList, cbHandleJoined }) => {
           <PlayerListThree playersList={playersList} isPlaying={false} />
         </Grid>
       </Box>
+      {hasJoinedRef.current && (
+        <Grid item xs={12} display="flex" justifyContent="center">
+          <ShareButton sharingUrl={getGameUrl()}/>
+        </Grid>
+      )}
       {isHost ? (
         <Grid container direction="row" spacing={4}>
           <Grid item xs={6}>

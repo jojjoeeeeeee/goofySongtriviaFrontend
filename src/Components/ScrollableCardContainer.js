@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { sessionSocket } from "../sessionSocket";
 
-const ScrollableCardContainer = ({ cardData }) => {
+const ScrollableCardContainer = ({ cardData, roomCode }) => {
   const [selectedCard, setSelectedCard] = useState("");
   const [playlists, setPlaylists] = useState([]);
   const [isJoined, setIsJoined] = useState(false);
@@ -47,16 +47,16 @@ const ScrollableCardContainer = ({ cardData }) => {
 
   useEffect(() => {
     if (playlists.length > 0) {
-      sessionSocket.emit("selectPlaylist", { playlistId: playlists[0].id });
+      sessionSocket.emit("selectPlaylist", { roomCode, playlistId: playlists[0].id });
     }
   }, [isJoined]);
 
   const handleRadioChange = (event) => {
-    sessionSocket.emit("selectPlaylist", { playlistId: event.target.value });
+    sessionSocket.emit("selectPlaylist", { roomCode, playlistId: event.target.value });
   };
 
   const handleSelectCard = (id) => {
-    sessionSocket.emit("selectPlaylist", { playlistId: id });
+    sessionSocket.emit("selectPlaylist", { roomCode, playlistId: id });
   };
 
   const fillArrayToMultipleOfThree = (arr, fillValue) => {
