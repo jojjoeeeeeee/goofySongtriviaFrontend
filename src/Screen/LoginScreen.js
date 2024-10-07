@@ -39,7 +39,12 @@ const LoginScreen = ({ cbOnGetAccessToken, cbOnGetRoomCode }) => {
       }
     });
 
+    sessionSocket.on("roomNotFound", () => {
+      setError("Room code not found")
+    });
+
     return () => {
+      sessionSocket.off("roomCreated");
       sessionSocket.off("gameInProgress");
       sessionSocket.off("onResetGame");
     };

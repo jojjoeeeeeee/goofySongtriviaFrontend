@@ -32,20 +32,13 @@ const ShareButton = ({ sharingUrl }) => {
 
   const shareLink = async () => {
     const url = sharingUrl; // The URL to share
-    console.log("NAVIGATOR !", navigator)
-    console.log("SHARE !", navigator.share)
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Goofy Song Trivia!',
-          text: 'Join with game code!',
-          url: url,
-        });
-        setMessage('Share successful!');
-      } catch (error) {
-        console.error('Error sharing:', error);
-        setMessage('Error sharing link.');
-      }
+      await navigator.share({
+        title: 'Goofy Song Trivia!',
+        text: 'Join with game code!',
+        url: url,
+      });
+      setMessage('Share successful!');
     } else {
       if (isMobileOrTablet) {
         shareOnDiscord();
@@ -59,12 +52,6 @@ const ShareButton = ({ sharingUrl }) => {
   const copyToClipboard = (text) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text)
-        .then(() => {
-          console.log('Link copied to clipboard');
-        })
-        .catch(err => {
-          console.error('Failed to copy: ', err);
-        });
     } else {
       // Fallback method for browsers without the Clipboard API
       const textarea = document.createElement('textarea');
@@ -73,9 +60,8 @@ const ShareButton = ({ sharingUrl }) => {
       textarea.select();
       try {
         document.execCommand('copy');
-        console.log('Link copied to clipboard (fallback)');
       } catch (err) {
-        console.error('Failed to copy (fallback): ', err);
+        setMessage('Error sharing link.');
       }
       document.body.removeChild(textarea);
     }
