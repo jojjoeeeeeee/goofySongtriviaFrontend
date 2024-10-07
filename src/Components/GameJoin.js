@@ -46,8 +46,13 @@ const GameJoin = ({ playersList, cbHandleOnStart, roomCode }) => {
       setIsHost(matchingPlayers[0].host);
     });
 
+    sessionSocket.on("hostDisconnected", () => {
+      window.location.reload();
+    });
+
     return () => {
       sessionSocket.off("getPlayer");
+      sessionSocket.off("hostDisconnected");
     };
   }, []);
 
