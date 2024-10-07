@@ -41,8 +41,8 @@ const ShareButton = ({ sharingUrl }) => {
         });
         setMessage('Share successful!');
       } catch (error) {
-        console.error('Error sharing:', error);
-        setMessage('Error sharing link.');
+        copyToClipboard(url);
+        setMessage('Link copied to clipboard!');
       }
     } else {
       if (isMobileOrTablet) {
