@@ -18,7 +18,6 @@ const GameRoom = ({ accessToken, playersList, roomCode }) => {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
   const handleCountdownComplete = () => {
-    console.log("Countdown has completed!");
     setCountdownActive(false);
     setIsStarted(true);
   };
@@ -67,18 +66,11 @@ const GameRoom = ({ accessToken, playersList, roomCode }) => {
       if (audioRef.current) {
         audioRef.current
           .play()
-          .then(() => {
-            console.log("Autoplay success: muted");
-          })
-          .catch((error) => {
-            console.error("Autoplay error:", error);
-          });
       }
     };
 
     document.addEventListener("click", playAudio);
     if (audioRef.current) {
-      console.log("load audio");
       audioRef.current.src =
         "https://p.scdn.co/mp3-preview/4be581ce9ba66b2998127d481d1977dc3ca948af?cid=136b45ab12ee44ba8c4ac1799d6af215'";
       audioRef.current.load();
@@ -92,39 +84,30 @@ const GameRoom = ({ accessToken, playersList, roomCode }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/api/spotify/user`, {
-          params: { room_code: roomCode, access_token: accessToken },
-        });
-        console.log("user id", response.data.id);
-        fetchPlaylists();
-      } catch (error) {
-        console.error("Error fetching user", error);
-      }
+      const response = await axios.get(`${endpoint}/api/spotify/user`, {
+        params: { room_code: roomCode, access_token: accessToken },
+      });
+      fetchPlaylists();
     };
 
     const fetchPlaylists = async () => {
-      try {
-        const response = await axios.get(`${endpoint}/api/spotify/playlists`, {
-          params: { room_code: roomCode, access_token: accessToken },
-        });
-        const excludePlaylistMinimum = response.data.items.filter(
-          (playlist) => {
-            return playlist.tracks.total >= 10;
-          }
-        );
-        const playlistData = excludePlaylistMinimum.map((playlist) => {
-          return {
-            id: playlist.id,
-            title: playlist.name,
-            image: playlist.images[0].url,
-            url: playlist.external_urls.spotify,
-          };
-        });
-        setPlaylists(playlistData);
-      } catch (error) {
-        console.error("Error fetching playlists", error);
-      }
+      const response = await axios.get(`${endpoint}/api/spotify/playlists`, {
+        params: { room_code: roomCode, access_token: accessToken },
+      });
+      const excludePlaylistMinimum = response.data.items.filter(
+        (playlist) => {
+          return playlist.tracks.total >= 10;
+        }
+      );
+      const playlistData = excludePlaylistMinimum.map((playlist) => {
+        return {
+          id: playlist.id,
+          title: playlist.name,
+          image: playlist.images[0].url,
+          url: playlist.external_urls.spotify,
+        };
+      });
+      setPlaylists(playlistData);
     };
 
     fetchUser();
