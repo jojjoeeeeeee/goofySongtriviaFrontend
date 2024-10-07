@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { sessionSocket } from "../sessionSocket";
 import { endpoint } from "../Config/Constant";
 import GameJoin from "../Components/GameJoin";
 import { Grid, useMediaQuery } from "@mui/material";
@@ -9,11 +8,10 @@ import CountdownOverlay from "../Components/ContdownOverlay";
 import Trivia from "../Components/Trivia";
 import SongListOverlay from "../Components/SongListOverlay";
 
-const GameRoom = ({ accessToken, playersList }) => {
+const GameRoom = ({ accessToken, playersList, roomCode }) => {
   const [playlists, setPlaylists] = useState([]);
   const [countdownActive, setCountdownActive] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
   const [songList, setSongList] = useState([]);
   const [isShowSongList, setIsShowSongList] = useState(false);
   const audioRef = useRef(null);
@@ -29,10 +27,6 @@ const GameRoom = ({ accessToken, playersList }) => {
     setCountdownActive(true);
   };
 
-  const handleUserJoined = () => {
-    console.log("joined");
-    setIsJoined(true);
-  };
 
   const handleLoadAudio = (audioUrl) => {
     if (audioRef.current) {
@@ -97,23 +91,10 @@ const GameRoom = ({ accessToken, playersList }) => {
   }, []);
 
   useEffect(() => {
-    sessionSocket.on("onStartGameCountDown", (data) => {
-      if (isJoined) {
-        setSongList(data);
-        startCountdown();
-      }
-    });
-
-    return () => {
-      sessionSocket.off("onStartGameCountdown");
-    };
-  }, [isJoined]);
-
-  useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(`${endpoint}/api/spotify/user`, {
-          params: { access_token: accessToken },
+          params: { room_code: roomCode, access_token: accessToken },
         });
         console.log("user id", response.data.id);
         fetchPlaylists();
@@ -125,7 +106,7 @@ const GameRoom = ({ accessToken, playersList }) => {
     const fetchPlaylists = async () => {
       try {
         const response = await axios.get(`${endpoint}/api/spotify/playlists`, {
-          params: { access_token: accessToken },
+          params: { room_code: roomCode, access_token: accessToken },
         });
         const excludePlaylistMinimum = response.data.items.filter(
           (playlist) => {
@@ -171,6 +152,7 @@ const GameRoom = ({ accessToken, playersList }) => {
               cbOnLoadAudio={handleLoadAudio}
               cbOnMuteAudio={handleMuteAudio}
               cbOnResetGame={handleOnResetGame}
+              roomCode={roomCode}
             />
           </Grid>
         ) : (
@@ -186,7 +168,8 @@ const GameRoom = ({ accessToken, playersList }) => {
           >
             <GameJoin
               playersList={playersList}
-              cbHandleJoined={handleUserJoined}
+              cbHandleOnStart={startCountdown}
+              roomCode={roomCode}
             />
           </Grid>
         )}
@@ -205,7 +188,7 @@ const GameRoom = ({ accessToken, playersList }) => {
           >
             <ScrollableCardContainer
               cardData={playlists}
-              playersList={playersList}
+              roomCode={roomCode}
             />
           </Grid>
         )}

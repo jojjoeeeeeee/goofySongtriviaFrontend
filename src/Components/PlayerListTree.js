@@ -71,9 +71,9 @@ const PlayerListThree = ({ playersList, isPlaying }) => {
       justifyContent="flex-start"
       width="100%"
       mx={0}
-      sx={{ 
+      sx={{
         overflowY: "hidden",
-        overflowX: "auto", 
+        overflowX: "auto",
         flexWrap: "nowrap",
         "&::-webkit-scrollbar": {
           width: "5px",
@@ -84,49 +84,49 @@ const PlayerListThree = ({ playersList, isPlaying }) => {
           borderRadius: "12px",
           border: "3px solid transparent",
           backgroundClip: "content-box",
-        }
+        },
       }}
     >
-      {players.length > 0 ? (
-        players.map((player, index) => (
-          <Grid item xs={3} sm={5} key={index} sx={{minWidth: "120px"}}>
-            <Grid
-              container
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Avatar
-                alt="profile_list"
-                src={player.avatarDataUri}
-                sx={
-                  isDesktop
-                    ? { width: 80, height: 80, border: "2px solid #fff" }
-                    : { width: 50, height: 50, border: "2px solid #fff" }
-                }
-              />
-              <Typography
-                variant={isDesktop ? "h5" : "body1"}
-                textAlign="center"
-                color={player.isYou ? "#fac326" : "#fff"}
+      {players.length > 0
+        ? players.map((player, index) => (
+            <Grid item xs={3} sm={5} key={index} sx={{ minWidth: "120px" }}>
+              <Grid
+                container
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
               >
-                {player.isYou ? `${player.username} (You)` : player.username}
-              </Typography>
-              <Typography
-                variant={isDesktop ? "h5" : "h6"}
-                textAlign="center"
-                color={player.isYou ? "#fac326" : "#fff"}
-              >
-                {player.score}
-              </Typography>
+                <Avatar
+                  alt="profile_list"
+                  src={player.avatarDataUri}
+                  sx={
+                    isDesktop
+                      ? { width: 80, height: 80, border: "2px solid #fff" }
+                      : { width: 50, height: 50, border: "2px solid #fff" }
+                  }
+                />
+                <Typography
+                  variant={isDesktop ? "h5" : "body1"}
+                  textAlign="center"
+                  color={player.isYou ? "#fac326" : "#fff"}
+                >
+                  {player.isYou ? `${player.username} (You)` : player.username}
+                </Typography>
+                <Typography
+                  variant={isDesktop ? "h5" : "h6"}
+                  textAlign="center"
+                  color={player.isYou ? "#fac326" : "#fff"}
+                >
+                  {player.score}
+                </Typography>
+              </Grid>
             </Grid>
-          </Grid>
-        ))
-      ) : !isPlaying && (
-        <Typography variant="body" color="white" mx={2} my={2}>
-          No one here ㅠㅠ
-        </Typography>
-      )}
+          ))
+        : !isPlaying && (
+            <Typography variant="body" color="white" mx={2} my={2}>
+              No one here ㅠㅠ
+            </Typography>
+          )}
     </Grid>
   ) : (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="center">

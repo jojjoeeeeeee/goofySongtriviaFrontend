@@ -24,33 +24,42 @@ const theme = createTheme({
 
 const App = () => {
   const [accessToken, setAccessToken] = useState(null);
-  const [session, setSession] = useState(false);
   const [players, setPlayers] = useState([]);
+  const [roomCode, setRoomCode] = useState(null);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    const token = query.get("access_token");
-    if (token) {
-      setAccessToken(token);
-      setSession(true);
-      window.history.replaceState({}, document.title, "/");
+    const roomCodeFromQuery = query.get("r");
+
+    if (roomCodeFromQuery) {
+      setRoomCode(roomCodeFromQuery);
     }
   }, []);
 
   useEffect(() => {
-    sessionSocket.emit("searchSession");
+    if (roomCode) {
+      sessionSocket.emit("searchSession", { roomCode });
+    }
+
     sessionSocket.on("getSession", (data) => {
       const { userList, accessToken } = data;
       if (userList.length === 0) return;
       setPlayers(userList);
-      setSession(true);
       setAccessToken(accessToken);
     });
 
     return () => {
       sessionSocket.off("getSession");
     };
-  }, []);
+  }, [roomCode]);
+
+  const handleOnGetAccessToken = (accessToken) => {
+    setAccessToken(accessToken);
+  }
+
+  const handleOnGetRoomCode = (roomCode) => {
+    setRoomCode(roomCode);
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -60,10 +69,8 @@ const App = () => {
           <Route
             path="/"
             element={
-              session ? (
-                <Navigate to="/game" />
-              ) : !accessToken ? (
-                <LoginScreen />
+              !(accessToken && roomCode) ? (
+                <LoginScreen cbOnGetAccessToken={handleOnGetAccessToken} cbOnGetRoomCode={handleOnGetRoomCode} />
               ) : (
                 <Navigate to="/game" />
               )
@@ -72,8 +79,8 @@ const App = () => {
           <Route
             path="/game"
             element={
-              accessToken ? (
-                <GameRoom accessToken={accessToken} playersList={players} />
+              (accessToken && roomCode) ? (
+                <GameRoom accessToken={accessToken} playersList={players} roomCode={roomCode} />
               ) : (
                 <Navigate to="/" />
               )

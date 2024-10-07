@@ -12,6 +12,7 @@ const Trivia = ({
   cbOnLoadAudio,
   cbOnMuteAudio,
   cbOnResetGame,
+  roomCode,
 }) => {
   const isDesktop = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [questionName, setQuestionName] = useState("");
@@ -37,6 +38,7 @@ const Trivia = ({
   const handleAnswerClick = (answer) => {
     if (!countdownActive && selectedAnswer === "") {
       sessionSocket.emit("submitAnswer", {
+        roomCode,
         answer,
         timeRemain: questionTimeRemain,
       });
@@ -83,7 +85,7 @@ const Trivia = ({
 
   const handlePodiumCountdown = () => {
     //need to move this after song list ended
-    sessionSocket.emit("onGameEndGetSongList");
+    sessionSocket.emit("onGameEndGetSongList", { roomCode });
   };
 
   useEffect(() => {
