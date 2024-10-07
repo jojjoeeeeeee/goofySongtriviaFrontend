@@ -41,7 +41,7 @@ const ShareButton = ({ sharingUrl }) => {
       setMessage('Share successful!');
     } else {
       if (isMobileOrTablet) {
-        shareOnDiscord();g
+        shareOnDiscord();
       }
       copyToClipboard(url);
       setMessage('Link copied to clipboard!');
