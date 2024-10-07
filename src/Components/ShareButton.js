@@ -33,20 +33,15 @@ const ShareButton = ({ sharingUrl }) => {
   const shareLink = async () => {
     const url = sharingUrl; // The URL to share
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Goofy Song Trivia!',
-          text: 'Join with game code!',
-          url: url,
-        });
-        setMessage('Share successful!');
-      } catch (error) {
-        copyToClipboard(url);
-        setMessage('Link copied to clipboard!');
-      }
+      await navigator.share({
+        title: 'Goofy Song Trivia!',
+        text: 'Join with game code!',
+        url: url,
+      });
+      setMessage('Share successful!');
     } else {
       if (isMobileOrTablet) {
-        shareOnDiscord();
+        shareOnDiscord();g
       }
       copyToClipboard(url);
       setMessage('Link copied to clipboard!');
@@ -66,6 +61,7 @@ const ShareButton = ({ sharingUrl }) => {
       try {
         document.execCommand('copy');
       } catch (err) {
+        setMessage('Error sharing link.');
       }
       document.body.removeChild(textarea);
     }
